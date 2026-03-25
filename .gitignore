@@ -1,0 +1,4 @@
+*.jar
+.proposals/
+*.log
+.DS_Store
