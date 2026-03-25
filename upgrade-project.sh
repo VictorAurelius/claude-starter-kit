@@ -82,9 +82,10 @@ if $ALL || $ONLY_SKILLS; then
     done
 fi
 
+# Templates: ONLY add if file does NOT exist (never overwrite customized files)
 if $ALL; then
-    add_pair "$SCRIPT_DIR/templates/CLAUDE.md.template" "$TARGET/CLAUDE.md" "CLAUDE.md"
-    add_pair "$SCRIPT_DIR/templates/README.md.template" "$TARGET/README.md" "README.md"
+    [ ! -f "$TARGET/CLAUDE.md" ] && add_pair "$SCRIPT_DIR/templates/CLAUDE.md.template" "$TARGET/CLAUDE.md" "CLAUDE.md"
+    [ ! -f "$TARGET/README.md" ] && add_pair "$SCRIPT_DIR/templates/README.md.template" "$TARGET/README.md" "README.md"
 fi
 
 if $ALL || $ONLY_MEMORY; then
