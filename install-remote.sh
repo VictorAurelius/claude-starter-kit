@@ -1,26 +1,29 @@
 #!/bin/bash
 # install-remote.sh — Install/upgrade starter-kit from remote git repo
 #
+# SAFE BY DEFAULT:
+#   - New project (no .starter-kit-version) → init-project.sh (copy all)
+#   - Existing project → upgrade-project.sh --plan (review before apply)
+#   - NEVER --force unless user explicitly passes it
+#
 # Usage:
-#   # Install from GitHub
-#   curl -sSL https://raw.githubusercontent.com/VictorAurelius/claude-starter-kit/main/install-remote.sh | bash -s /path/to/project
-#
-#   # Or clone and run
-#   git clone https://github.com/VictorAurelius/claude-starter-kit.git /tmp/kit
-#   bash /tmp/kit/install-remote.sh /path/to/project
-#
-#   # With specific version
-#   bash install-remote.sh /path/to/project --version 1.1.1
+#   bash /tmp/kit/install-remote.sh /path/to/project              # Safe default
+#   bash /tmp/kit/install-remote.sh /path/to/project --force      # Overwrite all (DANGEROUS)
+#   bash /tmp/kit/install-remote.sh /path/to/project --version 1.1.2  # Pin version
 
 set -uo pipefail
 
-TARGET="${1:?Usage: $0 /path/to/project [--version X.Y.Z]}"
+TARGET="${1:?Usage: $0 /path/to/project [--force] [--version X.Y.Z]}"
+FORCE=false
 VERSION_PIN=""
 
 for arg in "${@:2}"; do
     case "$arg" in
-        --version) shift; VERSION_PIN="$1" ;;
+        --force) FORCE=true ;;
+        --version) ;; # next arg handled below
+        *) [ "${prev:-}" = "--version" ] && VERSION_PIN="$arg" ;;
     esac
+    prev="$arg"
 done
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,7 +33,7 @@ echo "════════════════════════�
 echo "  Starter Kit Remote Install"
 echo "═══════════════════════════════════════════════"
 
-# If running from curl pipe, we need to clone first
+# If running from curl pipe, clone first
 if [ ! -f "$SCRIPT_DIR/VERSION" ]; then
     echo "Cloning starter-kit from $REPO_URL..."
     TEMP_DIR=$(mktemp -d)
@@ -56,25 +59,34 @@ fi
 echo "  Installed: v$INSTALLED_VERSION"
 echo ""
 
-if [ "$INSTALLED_VERSION" = "$KIT_VERSION" ]; then
+# Same version → skip
+if [ "$INSTALLED_VERSION" = "$KIT_VERSION" ] && ! $FORCE; then
     echo "Already on latest version (v$KIT_VERSION). Nothing to do."
+    echo "Use --force to re-apply."
     exit 0
 fi
 
-# Delegate to upgrade-project.sh
-if [ -f "$SCRIPT_DIR/upgrade-project.sh" ]; then
-    echo "Running upgrade..."
-    bash "$SCRIPT_DIR/upgrade-project.sh" "$TARGET" --force
-else
-    echo "ERROR: upgrade-project.sh not found in kit"
-    exit 1
+# ─── New project → init ───
+if [ "$INSTALLED_VERSION" = "none" ]; then
+    echo "New project detected → running init..."
+    bash "$SCRIPT_DIR/init-project.sh" "$TARGET"
+    exit $?
 fi
 
-echo ""
-echo "═══════════════════════════════════════════════"
-echo "  Installed v$KIT_VERSION"
-echo "═══════════════════════════════════════════════"
-echo ""
-echo "To update in the future:"
-echo "  git clone $REPO_URL /tmp/kit"
-echo "  bash /tmp/kit/install-remote.sh $TARGET"
+# ─── Existing project → safe upgrade ───
+if $FORCE; then
+    echo "⚠️  WARNING: --force will overwrite ALL files including your customizations!"
+    echo "  Consider using without --force to get a review plan first."
+    echo ""
+    bash "$SCRIPT_DIR/upgrade-project.sh" "$TARGET" --force
+else
+    echo "Existing project detected → generating upgrade plan..."
+    echo "(Your custom files will NOT be overwritten)"
+    echo ""
+    bash "$SCRIPT_DIR/upgrade-project.sh" "$TARGET" --plan
+    echo ""
+    echo "═══════════════════════════════════════════════"
+    echo "  Review the plan, then apply:"
+    echo "  bash $SCRIPT_DIR/upgrade-project.sh $TARGET --apply"
+    echo "═══════════════════════════════════════════════"
+fi

@@ -97,10 +97,30 @@ if $ALL || $ONLY_MEMORY; then
     done
 fi
 
+# ─── Load manifest for file classification ───
+MANIFEST="$SCRIPT_DIR/kit-manifest.yml"
+
+get_file_class() {
+    local label="$1"
+    if [ ! -f "$MANIFEST" ]; then
+        echo "merge-required"  # safe default
+        return
+    fi
+    # Check each category
+    if grep -A50 "^override-safe:" "$MANIFEST" | grep -q "$(echo "$label" | sed 's|.claude/skills/|skills/|; s|.claude/scripts/|scripts/|')" 2>/dev/null; then
+        echo "override-safe"
+    elif grep -A20 "^new-only:" "$MANIFEST" | grep -q "$(echo "$label" | sed 's|.claude/skills/|skills/|; s|.claude/scripts/|scripts/|')" 2>/dev/null; then
+        echo "new-only"
+    else
+        echo "merge-required"
+    fi
+}
+
 # ─── Classify each file ───
 declare -a NEW_FILES=()
 declare -a CHANGED_FILES=()
 declare -a IDENTICAL_FILES=()
+declare -a SAFE_OVERRIDE_FILES=()
 
 for pair in "${PAIRS[@]}"; do
     IFS='|' read -r src dst label <<< "$pair"
@@ -109,7 +129,18 @@ for pair in "${PAIRS[@]}"; do
     elif diff -q "$src" "$dst" > /dev/null 2>&1; then
         IDENTICAL_FILES+=("$pair")
     else
-        CHANGED_FILES+=("$pair")
+        file_class=$(get_file_class "$label")
+        case "$file_class" in
+            override-safe)
+                SAFE_OVERRIDE_FILES+=("$pair")
+                ;;
+            new-only)
+                IDENTICAL_FILES+=("$pair")  # already exists, treat as identical
+                ;;
+            merge-required|*)
+                CHANGED_FILES+=("$pair")
+                ;;
+        esac
     fi
 done
 
@@ -117,9 +148,10 @@ done
 if [ "$MODE" = "plan" ] || [ "$MODE" = "dry-run" ]; then
     echo "Scanning ${#PAIRS[@]} files..."
     echo ""
-    echo "  ➕ New:       ${#NEW_FILES[@]}"
-    echo "  📝 Changed:   ${#CHANGED_FILES[@]}"
-    echo "  = Identical:  ${#IDENTICAL_FILES[@]}"
+    echo "  ➕ New:         ${#NEW_FILES[@]}"
+    echo "  ✅ Safe update: ${#SAFE_OVERRIDE_FILES[@]} (auto-apply)"
+    echo "  ⚠️  Customized:  ${#CHANGED_FILES[@]} (review required)"
+    echo "  = Identical:    ${#IDENTICAL_FILES[@]}"
     echo ""
 
     if [ ${#NEW_FILES[@]} -eq 0 ] && [ ${#CHANGED_FILES[@]} -eq 0 ]; then
@@ -152,8 +184,22 @@ Target: $TARGET
 "
     done
 
+    if [ ${#SAFE_OVERRIDE_FILES[@]} -gt 0 ]; then
+        PLAN_CONTENT+="
+## Safe Updates (auto-applied, no customization risk)
+
+| File | Action |
+|------|--------|
+"
+        for pair in "${SAFE_OVERRIDE_FILES[@]}"; do
+            IFS='|' read -r src dst label <<< "$pair"
+            PLAN_CONTENT+="| $label | **auto-update** |
+"
+        done
+    fi
+
     PLAN_CONTENT+="
-## Changed Files (review required)
+## Customized Files (review required — these may have project-specific changes)
 
 "
     for pair in "${CHANGED_FILES[@]}"; do
@@ -206,6 +252,15 @@ if [ "$MODE" = "apply" ]; then
 
     echo "Applying plan from: $PLAN_FILE"
     echo ""
+
+    # Apply safe-override files automatically
+    for pair in "${SAFE_OVERRIDE_FILES[@]}"; do
+        IFS='|' read -r src dst label <<< "$pair"
+        cp "$src" "$dst"
+        [ "${dst##*.}" = "sh" ] && chmod +x "$dst"
+        echo "  ✅ Auto-updated: $label"
+        ((UPDATED++))
+    done
 
     # Apply all new files
     for pair in "${NEW_FILES[@]}"; do
