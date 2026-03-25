@@ -106,14 +106,23 @@ get_file_class() {
         echo "merge-required"  # safe default
         return
     fi
-    # Check each category
-    if grep -A50 "^override-safe:" "$MANIFEST" | grep -q "$(echo "$label" | sed 's|.claude/skills/|skills/|; s|.claude/scripts/|scripts/|')" 2>/dev/null; then
-        echo "override-safe"
-    elif grep -A20 "^new-only:" "$MANIFEST" | grep -q "$(echo "$label" | sed 's|.claude/skills/|skills/|; s|.claude/scripts/|scripts/|')" 2>/dev/null; then
-        echo "new-only"
-    else
-        echo "merge-required"
-    fi
+    # Normalize label: .claude/skills/X → skills/X, .claude/scripts/X → scripts/X
+    local normalized
+    normalized=$(echo "$label" | sed 's|^\.claude/skills/|skills/|; s|^\.claude/scripts/|scripts/|')
+
+    # Parse manifest by section (stop at next section header)
+    local section=""
+    while IFS= read -r line; do
+        case "$line" in
+            override-safe:*) section="override-safe" ;;
+            new-only:*) section="new-only" ;;
+            merge-required:*) section="merge-required" ;;
+            *"- $normalized"*) echo "$section"; return ;;
+            *"- "*) ;; # other entry, skip
+        esac
+    done < "$MANIFEST"
+
+    echo "merge-required"  # default if not found
 }
 
 # ─── Classify each file ───
