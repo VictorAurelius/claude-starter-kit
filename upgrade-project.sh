@@ -154,7 +154,7 @@ if [ "$MODE" = "plan" ] || [ "$MODE" = "dry-run" ]; then
     echo "  = Identical:    ${#IDENTICAL_FILES[@]}"
     echo ""
 
-    if [ ${#NEW_FILES[@]} -eq 0 ] && [ ${#CHANGED_FILES[@]} -eq 0 ]; then
+    if [ ${#NEW_FILES[@]} -eq 0 ] && [ ${#CHANGED_FILES[@]} -eq 0 ] && [ ${#SAFE_OVERRIDE_FILES[@]} -eq 0 ]; then
         echo "  ✅ Nothing to upgrade — all files identical"
         exit 0
     fi
