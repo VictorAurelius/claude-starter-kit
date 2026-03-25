@@ -1,8 +1,24 @@
 # Claude Code Starter Kit
 
-**Version:** 1.0.0 (xem CHANGELOG.md)
+**Version:** 1.2.0 (xem CHANGELOG.md)
 
 Bộ skills, scripts, templates rút ra từ kinh nghiệm phát triển dự án thực tế (~200+ PRs, 10+ waves). Được quản lý như internal package với versioning và review process.
+
+## Quick Start — Copy prompt vào Claude Code
+
+### Dự án MỚI
+
+```
+Fetch https://raw.githubusercontent.com/VictorAurelius/claude-starter-kit/main/INSTALL.md rồi thực hiện theo hướng dẫn cho dự án mới
+```
+
+### Dự án ĐÃ CÓ custom skills
+
+```
+Fetch https://raw.githubusercontent.com/VictorAurelius/claude-starter-kit/main/INSTALL.md rồi thực hiện theo hướng dẫn update cho dự án đã có. LƯU Ý: không dùng --force, chỉ dùng --plan rồi show plan để tôi review trước khi --apply
+```
+
+---
 
 ## Dùng khi nào?
 
@@ -10,22 +26,19 @@ Bộ skills, scripts, templates rút ra từ kinh nghiệm phát triển dự á
 - Dự án đã có → tiếp nhận best practices không overwrite customizations
 - Dự án phát hiện cải tiến → đóng góp ngược vào kit cho các dự án khác
 
-## 3 Scenarios
+## Manual Install
 
 ### 1. Dự án MỚI
 
 ```bash
-./init-project.sh /path/to/new-project
+git clone https://github.com/VictorAurelius/claude-starter-kit.git /tmp/kit && bash /tmp/kit/init-project.sh .
 ```
 
 ### 2. Dự án ĐÃ CÓ skills/workflows
 
 ```bash
-./upgrade-project.sh /path/to/project --dry-run    # Preview
-./upgrade-project.sh /path/to/project               # Interactive (keep/use/merge per file)
-./upgrade-project.sh /path/to/project --scripts     # Chỉ scripts
-./upgrade-project.sh /path/to/project --skills      # Chỉ skills
-./upgrade-project.sh /path/to/project --memory      # Chỉ memories
+git clone https://github.com/VictorAurelius/claude-starter-kit.git /tmp/kit && bash /tmp/kit/install-remote.sh .
+# → Generates upgrade plan → review → apply
 ```
 
 Version tracking tự động — skip nếu đã trên latest version.
