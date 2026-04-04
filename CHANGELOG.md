@@ -7,6 +7,18 @@ Quản lý theo Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
+## [2.2.0] — 2026-04-04
+
+### Added
+- `docs/vibe-coding-guide/` — Bộ hướng dẫn Vibe Coding cho người trái ngành IT
+  - 23 Jupyter notebooks (.ipynb) bằng tiếng Việt
+  - 5 phần: Nền tảng → Starter Kit → Superpowers → Business Logic → Thực hành
+  - Giải thích từ AI/LLM cơ bản đến quy trình phát triển sản phẩm chuyên nghiệp
+  - Mỗi khái niệm kỹ thuật = ví von đời thường + bash cells chạy thử
+  - Target: non-developer có thể vibe code ra sản phẩm chất lượng theo chuẩn kit
+
+---
+
 ## [2.1.0] — 2026-04-02
 
 ### Added
