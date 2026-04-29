@@ -1,5 +1,12 @@
 # Skill Conventions — Based on Anthropic Internal Best Practices
 
+**Priority:** 🟠 MANDATORY — governance for `.claude/skills/**`
+**Version:** 1.0.0
+**Created:** 2026-04-01
+**Last-Reviewed:** 2026-04-29
+**Reviewer-Approver:** @nguyenvankiet (starter-kit upstream maintainer)
+**Applies to:** Every skill file under `.claude/skills/**` (SKILL.md, references, scripts, fixtures) and the starter-kit copies under `.claude/starter-kit/`
+
 How to write Agent Skills that maximize quality and minimize token waste.
 
 ## Core Principle
@@ -68,10 +75,10 @@ Claude knows TDD, debugging methodology, brainstorming techniques, Git workflow,
 [generic examples in Java, TypeScript...]
 
 # GOOD — 30 lines of project-specific gotchas
-## Smart Quiz Test Gotchas
+## My-App Test Gotchas
 1. Always mock speechSynthesis.cancel — tests crash without it
 2. Guard window access — SSR has no window
-3. Quiz direction tests — test all 3: ja-vi, vi-ja, vi-romaji
+3. Quiz direction tests — test all 3: A→B, B→A, B→C
 ```
 
 **What TO include**:
@@ -181,7 +188,7 @@ When modifying the starter-kit, follow this checklist **every time**:
 
 The starter-kit has a canonical remote repo: `github.com/VictorAurelius/claude-starter-kit` (branch: `main`).
 
-Projects that use the kit (like Smart Quiz) have a **local copy** at `.claude/starter-kit/`.
+Projects that use the kit have a **local copy** at `.claude/starter-kit/`.
 
 ### Before modifying kit in any project
 
@@ -213,34 +220,47 @@ Projects that use the kit (like Smart Quiz) have a **local copy** at `.claude/st
 - Project copies may have project-specific customizations in `core/` skills — don't overwrite remote generic templates with project-specific content
 - Always compare file-by-file, not bulk copy
 
-## UI Audit Workflow (for frontend projects)
+---
 
-Battle-tested workflow from 17 audit runs + 40 PRs. Use `skills/quality/ui-review/` skill + `scripts/capture-screenshots.ts`.
+## UI Audit Workflow (cho frontend projects)
+
+Battle-tested across many audit runs + PRs. Use a `quality/ui-review` skill + a `capture-screenshots.ts` script.
 
 ### Workflow
 
 ```
-BEFORE FIX:  capture --label before-pr-XXX
-FIX CODE:    PR → merge
-AFTER FIX:   capture --label after-pr-XXX (auto, don't wait for user)
-             visual verify → report delta
-DEPLOY:      capture --label prod → verify prod vs local
+FULL AUDIT:     capture all → score all screens → identify issues
+FIX CODE:       PR with fixes
+TARGETED AUDIT: capture + score CHỈ screens bị ảnh hưởng → verify fixes → merge
+DEPLOY:         capture --label prod → verify prod vs local
 ```
+
+**QUAN TRỌNG:** Sau khi fix, KHÔNG chạy full audit lại. Chỉ audit lại screens/pages đã fix.
+Full re-audit chỉ khi: (1) release mới, (2) user yêu cầu, (3) thay đổi ảnh hưởng toàn bộ (theme, layout system).
+
+Tương tự cho **Quality Audit**: chỉ re-score categories bị ảnh hưởng bởi fix.
 
 ### Key rules (learned from real mistakes)
 
-1. **Auto-capture after EVERY frontend PR** — don't wait for user to ask (user had to remind 5+ times)
-2. **Always update `latest/` folder** — user browses this in IDE
-3. **Before screenshots are MANDATORY** — without them, can't prove fix improved anything
-4. **Score what you SEE, not what code says** — self-scoring was 35pts too generous vs external audit
-5. **"Has feature" = 2/4** — feature must work WELL + be consistent across ALL screens for 3/4
-6. **Per-screen scoring** — don't average away weak screens
-7. **Fix verification step 0** — check previous issues BEFORE scoring new version
-8. **Screenshots gitignored** — local only, never commit PNGs
+1. **Auto-capture sau MỌI frontend PR** — không chờ user hỏi (user phải nhắc 5+ lần)
+2. **Luôn update `latest/` folder** — user browse folder này trong IDE
+3. **Before screenshots là BẮT BUỘC** — không có before, không thể prove fix improved anything
+4. **Score what you SEE** — không self-score theo code; external auditor thường thấp hơn 20–35 pts
+5. **"Có feature" = 2/4** — feature phải work WELL + nhất quán TRÊN TẤT CẢ screens mới được 3/4
+6. **Per-screen scoring** — không average away weak screens
+7. **Fix verification step 0** — check previous issues TRƯỚC khi score version mới
+8. **Screenshots gitignored** — local only, không commit PNG
 
-### Files provided
+### Files
 
 | File | Purpose |
 |------|---------|
-| `skills/quality/ui-review/SKILL.md` | Portable audit skill (adapt pages + scoring) |
-| `scripts/capture-screenshots.ts` | Auto dev server + labeled folders + per-page subfolders |
+| `.claude/skills/quality/ui-review/SKILL.md` | Portable audit skill (adapt pages + scoring) |
+| `your-frontend/scripts/capture-screenshots.ts` | Auto dev server + labeled folders |
+
+---
+
+## Log
+
+- **2026-04-29** (v1.0.0 upstream import): Imported into starter-kit v2.3.0 from project source. Light scrub applied — UI Audit Workflow paths replaced `kiteclass-frontend/` with generic `your-frontend/`; project-specific examples genericized. Local project remains source of truth; upstream version may diverge as starter-kit evolves separately.
+- **2026-04-28** (v1.0.0 backfill): Frontmatter backfill — added Priority + Version + Created + Last-Reviewed + Reviewer-Approver + Applies-to fields, plus this Log section (rule originally lacked one). No content change. Created date 2026-04-01 derived from git history (first commit of file).

@@ -7,6 +7,36 @@ Quản lý theo Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
+## [2.3.0] — 2026-04-29 — Q2 retro-sync, rules batch
+
+### Added (9 rules from downstream meta-governance)
+
+- `rules/rule-change-process.md` (v1.1.0) — semver governance for rule edits, paired with §6.5 Enforcement Parity Mandate
+- `rules/output-review-mandate.md` (v1.2.0) — master mandate; every output type has documented review standard + process + evidence
+- `rules/audit-to-gap-pipeline.md` (v1.0.0) — Issue → Gap Check → Gap File → Memory → Fix PR pipeline with state-check Step 2.5
+- `rules/meta-gap-priority.md` (v1.0.0) — meta gaps ahead of feature gaps at same P-level (force-multiplier rule)
+- `rules/gap-done-discipline.md` (v1.0.0) — banned-phrase list + PARTIAL exit ramp + override trailer for gap closure
+- `rules/incident-to-rule-pipeline.md` (v1.0.0) — 5-stage pipeline turning user-flagged misses into permanent guards (Detect → Classify → Rule+Enforce → Self-Test → Retro Log)
+- `rules/mcp-first-with-fallback.md` (v1.0.0) — tool selection: MCP-first, CLI fallback
+- `rules/docs-folder-structure.md` (v1.0.0) — generic README-per-top-level rule for `documents/` tree
+
+### Updated
+
+- `rules/skill-conventions.md` (v1.0.0) — Anthropic-internal skill best-practices expanded with starter-kit version-management discipline + UI Audit Workflow section. Light-scrubbed to remove project-specific paths (replaced `kiteclass-frontend/` with generic `your-frontend/`). Frontmatter added (Priority + Version + Created + Last-Reviewed + Reviewer-Approver + Applies-to).
+
+### Notes
+
+- Source: downstream project Kite Platform (private), 2026-04-04 → 2026-04-29 meta-governance evolution. Triage report `retro-sync-triage-2026-04-29.md` identified 110 candidates; this batch ships 9 rules. Skills batches deferred to v2.4.0 (core+workflow) + v2.5.0 (quality+reference).
+- All rules pass triage 4-question checklist (Generalize / Stable / No project paths / Battle-tested).
+- Light scrubbing applied to 3 rules (`output-review-mandate`, `skill-conventions`, `meta-gap-priority`) — specific GAP IDs replaced with `<example: GAP-XXX>` placeholders.
+- Rule 13 detector for `gap-done-discipline.md` (skill-side) deferred to v2.4.0 skills batch.
+
+### Migration
+
+For existing kit consumers: drop the new rules into `.claude/rules/`. No breaking changes (additive only). MINOR bump per `rules/skill-conventions.md §Starter-Kit Version Management`.
+
+---
+
 ## [2.2.0] — 2026-04-04
 
 ### Added
