@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions / Ideas
+    url: https://github.com/VictorAurelius/claude-starter-kit/discussions
+    about: General questions about Claude Code workflow — use Discussions

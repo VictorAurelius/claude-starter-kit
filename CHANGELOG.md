@@ -7,6 +7,44 @@ Quản lý theo Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
+## [2.4.1] — 2026-05-14 — Trending polish
+
+### Added
+
+- `LICENSE` (MIT) — broadest adoption permission
+- `README.vi.md` — Vietnamese version (full content preserved from v2.3.0 era + v2.4.0 sync)
+- `.github/PULL_REQUEST_TEMPLATE.md` — PR submission template with 4-question triage checklist
+- `.github/ISSUE_TEMPLATE/bug_report.md` — bug report template
+- `.github/ISSUE_TEMPLATE/rule_proposal.md` — rule contribution proposal template
+- `.github/ISSUE_TEMPLATE/skill_proposal.md` — skill contribution proposal template
+- `.github/ISSUE_TEMPLATE/config.yml` — disables blank issues; routes general questions to Discussions
+- `CODE_OF_CONDUCT.md` — Contributor Covenant v2.1 reference (root)
+- `SECURITY.md` — vulnerability reporting policy (root)
+- `CONTRIBUTING.md` (root) — quick-start pointer to `docs/CONTRIBUTING.md` for GitHub UI detection
+- `examples/minimal-project/` — minimal example skeleton showing kit usage on bare project
+- `examples/with-governance/` — example skeleton with full governance stack
+
+### Changed
+
+- `README.md` rewritten EN-first with:
+  - Hero block (centered tagline + 5-badge row: version / license / stars / last-commit / made-with-claude)
+  - Language switcher to `README.vi.md`
+  - "Why this exists" elevator pitch (3 lines)
+  - "What's inside" table (Rules / Skills / Scripts / Templates)
+  - Quick-start 3-command block
+  - Comparison table vs vanilla templates / awesome-lists / hand-rolled `.claude/`
+  - Use cases (3 personas)
+  - Star history chart embed
+  - Footer with star call-to-action
+
+### Notes
+
+- Paired with repo metadata Phase 1 (already shipped 2026-05-14 via gh API): 10 topics (`claude-code`, `claude-ai`, `anthropic`, `agent-skills`, `ai-agent`, `developer-workflow`, `governance`, `vietnamese`, `bilingual`, `boilerplate`), sharpened description, Discussions enabled.
+- Phase 4 deferred: social preview banner (1280×640 SVG) — agent run encountered content-filter; banner ships separately when user provides design preference or template.
+- Source repo: paired with downstream `2026-Kite-Class-Platform` PR (statusline + closure work concurrent).
+
+---
+
 ## [2.4.0] — 2026-05-14 — Governance + Deploy Core retro-sync batch 1
 
 ### Added (17 new rules from downstream meta-governance)
