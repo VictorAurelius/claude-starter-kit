@@ -7,6 +7,50 @@ Quản lý theo Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
+## [2.6.0] — 2026-05-23 — Thesis tooling bundle (rule + skill + memory)
+
+### Added (1 new rule + 1 new skill + 1 new memory entry)
+
+**New rule:**
+- `rules/thesis-content-standard.md` (v1.0.0) — academic-quality 9-category rubric /100 cho khóa luận tốt nghiệp Việt Nam university (UTC/HUST/UET/HCMUT/BKHN convention). Categories: C1 Format (15) + C2 Content+page count (15) + C3 Bibliography IEEE (15) + C4 Academic tone (15) + C5 Project-internal scrub (10) + C6 Draft-marker scrub (5) + C7 Diagram+figure rendering (10) + C8 Examiner readiness (10) + C9 Compliance+legal (5). Plus §5 extension rules S1-S8 (single-child heading ban + chapter intro/summary ban + VN narrative strict + citation evidence + measurement methodology + cross-ref integrity + acronym first-use + figure source attribution). Plus §4 page-count cap (cử nhân 90 / kỹ sư 120 / thạc sĩ 200 auto-FAIL).
+
+**New skill:**
+- `skills/document-generation/thesis/SKILL.md` — 6-phase workflow (planning → draft → 3-agent outside-in audit → fix sweep → DOCX assembly → defense prep) backed by `thesis-content-standard.md` rubric scoring
+- `skills/document-generation/thesis/reference/outside-in-audit-prompts.md` — 3-agent roleplay prompt templates (persona simulation + sample benchmark + failure-mode matrix)
+- `skills/document-generation/thesis/reference/vn-thesis-conventions.md` — UTC/HUST/UET/HCMUT/BKHN format baseline (A4 + TNR 13pt + margins + numbering + frontmatter + IEEE bibliography)
+- `skills/document-generation/thesis/templates/thesis-info.md.template` — student/advisor info template
+- `skills/document-generation/thesis/templates/chapter-mapping.md.template` — 4-5 chapter outline template (VN cử nhân CNTT typical)
+- `skills/document-generation/thesis/templates/bibliography.md.template` — IEEE bibliography template (6 sections — textbook / paper / standard / law / vendor / grey lit)
+- `skills/document-generation/thesis/templates/thesis-assemble.py.template` — python-docx pipeline (cover page + chapter parsing + Mermaid → PNG via mermaid-cli + bibliography append + A4 verify)
+- `skills/document-generation/thesis/scripts/check-thesis-content-standard.sh` — heuristic grep validator for §3 banned patterns (C5 project-internal refs + C6 draft markers + C4 emoji/đối thủ/pronoun + S2 chapter intro/summary + C9 compliance violations)
+
+**New memory entry:**
+- `memory/feedback_thesis_outside_in_audit.md` — must run 3-agent outside-in audit BEFORE inside-out review; inside-out consistently inflates score 30-40 points vs realistic committee-perspective rubric. Worked example: 110-page bachelor thesis V1 inside-out 82/100 B- vs outside-in 42/100 F (gap = 5 critical content-quality dimensions bị bỏ sót).
+
+### Why this batch
+
+Downstream project shipped Vietnamese-university bachelor thesis V1 sprint 2026-05-19..05-20 using project as topic. Outside-in audit surfaced 82 findings beyond user's 14 inside-out items → rubric v2 (9-category) developed to codify previously-implicit content-quality dimensions. This kit version promotes the rubric + workflow + tooling for any team using Claude Code to ship academic deliverables.
+
+Opinionated scope: rule is opinionated for Vietnamese-university bachelor/engineer/master thesis convention (UTC/HUST/UET/HCMUT/BKHN — similar). Universities ngoài VN cần adapt §C1 format + numbering + bibliography style + page-count target per local spec.
+
+### Light-scrub applied
+
+Per kit philosophy — UTC-specific terms → generic "your school's spec PDF" + `documents/08-thesis/` → placeholder `documents/<thesis-dir>/` + project gap IDs / wave names / KiteHub/KiteClass brand → generic phrasing + persona simulation references → generic VN edu placeholders. Rubric structure (9 categories /100) + 8 extension rules + banned patterns matrix preserved unchanged (generalizable academic-writing constraints). Reviewer maintainer line standardized: `@nguyenvankiet (starter-kit upstream maintainer)`.
+
+### Cumulative kit state post v2.6.0
+
+- 39 rules (38 from v2.5.0 + 1 thesis-content-standard.md)
+- 2 skills with SKILL.md (ui-review from v2.3.0 + thesis from v2.6.0)
+- 5 memory entries (4 from v2.5.0 + 1 thesis-outside-in-audit)
+
+### Deferred to v2.7.0+
+
+- Provider-specific rules (terraform-apply-retry-reconfirm.md, terraform-partial-backend-public-repo.md) — coherent only with terraform context; consider generic-framing migration later
+- Sister skills: quality/security-audit/, quality/business-logic-audit/, quality/pre-flight-check/, quality/wave-pack-planner/, quality/release-deploy/, workflow/wave-completion-check/ — retro-sync separately once stabilization signal confirmed
+- AWS-narrow rules (agent-aws-access.md, aws-observability-first.md, aws-sg-description-ascii.md) — explicitly NOT shipped per provider-neutral kit philosophy
+
+---
+
 ## [2.5.0] — 2026-05-14 — Production Hardening + Verification family retro-sync batch 2
 
 ### Added (12 new rules from downstream meta-governance)

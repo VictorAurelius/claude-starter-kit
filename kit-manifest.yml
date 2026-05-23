@@ -12,11 +12,16 @@ override-safe:
   - skills/reference/project-structure.md
   - skills/reference/service-docs-standard.md
   - skills/_README-skills-index.md
+  - skills/document-generation/thesis/reference/*.md
+  - skills/document-generation/thesis/scripts/check-thesis-content-standard.sh
 
 new-only:
   - memory/*.md
   - skills/quality/quality-audit.md
   - skills/reference/business-docs-3-layer.md
+  - skills/document-generation/thesis/SKILL.md
+  - skills/document-generation/thesis/templates/*.template
+  - rules/thesis-content-standard.md
 
 merge-required:
   - skills/core/brainstorming-methodology.md
