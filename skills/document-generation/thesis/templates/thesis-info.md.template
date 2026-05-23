@@ -1,0 +1,67 @@
+---
+audience: dev
+---
+
+# Thesis Info — fill before starting workflow
+
+Copy this file to `documents/<thesis-dir>/thesis-info.md` and fill all fields.
+
+## Student
+
+- **Họ tên:** [HỌ TÊN]
+- **MSSV:** [NUMBER]
+- **Lớp:** [CLASS CODE]
+- **Khóa:** [YEAR]
+- **Email:** [student@school.edu.vn]
+
+## Advisor + Reviewer
+
+- **GVHD (Giảng viên hướng dẫn):** [HỌC HÀM. HỌ TÊN]
+- **GVPB (Giảng viên phản biện):** [HỌC HÀM. HỌ TÊN] (if assigned; can be TBD)
+
+## School + Faculty
+
+- **Trường:** [SCHOOL NAME — e.g., Đại học Giao thông Vận tải Hà Nội]
+- **Khoa:** [FACULTY NAME — e.g., Công nghệ thông tin]
+- **Bộ môn:** [DEPARTMENT NAME — e.g., Kỹ thuật phần mềm]
+
+## Thesis scope
+
+- **Level:** [cử nhân / kỹ sư / thạc sĩ]
+- **Title (Vietnamese):** [TIÊU ĐỀ]
+- **Title (English) — optional:** [TITLE]
+- **Subtitle — optional:** [SUBTITLE]
+
+## Target metrics
+
+- **Page count target:** [60-80 bachelor / 80-110 engineer / 120-180 master]
+- **Page count hard cap (auto-FAIL):** [90 bachelor / 120 engineer / 200 master]
+- **Bibliography count target:** [≥30 bachelor / ≥50 engineer / ≥80 master]
+- **Rubric target:** ≥75/100 C+ per `thesis-content-standard.md`
+
+## Timeline
+
+- **Outline finalized:** [YYYY-MM-DD]
+- **Draft V1 target:** [YYYY-MM-DD]
+- **Outside-in audit:** [YYYY-MM-DD]
+- **Fix sweep complete:** [YYYY-MM-DD]
+- **DOCX assembly + final polish:** [YYYY-MM-DD]
+- **Submission deadline:** [YYYY-MM-DD]
+- **Defense window:** [YYYY-MM-DD to YYYY-MM-DD]
+
+## Source spec docs
+
+- [ ] Your school's "Quy định trình bày đồ án tốt nghiệp" PDF (copy to `documents/<thesis-dir>/references/spec/`)
+- [ ] 2-3 known-good DOCX samples from your faculty's archive (copy to `documents/<thesis-dir>/references/samples/`)
+- [ ] Your department's giáo trình references (cite 1-2 in bibliography per rule §C3)
+
+## Output files
+
+- `chapters/chapter-1-tong-quan.md` — Chương 1 Tổng quan
+- `chapters/chapter-2-co-so-ly-thuyet.md` — Chương 2 Cơ sở lý thuyết + Phân tích yêu cầu
+- `chapters/chapter-3-thiet-ke.md` — Chương 3 Thiết kế hệ thống
+- `chapters/chapter-4-trien-khai.md` — Chương 4 Triển khai và Kết quả
+- `chapters/chapter-5-ket-luan.md` — KẾT LUẬN VÀ KIẾN NGHỊ
+- `references/bibliography.md` — IEEE bibliography
+- `figures/` — pre-rendered Mermaid → PNG figures
+- `thesis-v1.docx` — final assembled deliverable (gitignored; regen via assemble script)

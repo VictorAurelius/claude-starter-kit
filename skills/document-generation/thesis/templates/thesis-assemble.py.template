@@ -1,0 +1,408 @@
+#!/usr/bin/env python3
+"""
+thesis-assemble.py — Template for assembling thesis DOCX from chapter MDs.
+
+Copy to your project: scripts/assemble-thesis.py
+Adapt SCHOOL_LOGO_PATH + COVER_PAGE_LAYOUT + STYLE_MAP to your school's convention.
+
+Usage:
+    python3 scripts/assemble-thesis.py \\
+      --chapters documents/<thesis-dir>/chapters/ \\
+      --bibliography documents/<thesis-dir>/references/bibliography.md \\
+      --info documents/<thesis-dir>/thesis-info.md \\
+      --output documents/<thesis-dir>/thesis-v1.docx
+
+Dependencies:
+    pip install python-docx markdown beautifulsoup4 pyyaml
+    npm install -g @mermaid-js/mermaid-cli  # for Mermaid → PNG pre-render
+"""
+
+import argparse
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+try:
+    from docx import Document
+    from docx.shared import Cm, Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
+    from docx.enum.section import WD_ORIENT
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+except ImportError:
+    print("ERROR: python-docx not installed. Run: pip install python-docx", file=sys.stderr)
+    sys.exit(1)
+
+# =============================================================================
+# CONFIG — adapt to your school's convention
+# =============================================================================
+
+# Page setup (UTC / HUST / UET / HCMUT / BKHN baseline — A4 + standard margins)
+PAGE_WIDTH_CM = 21.0
+PAGE_HEIGHT_CM = 29.7
+MARGIN_TOP_CM = 2.5
+MARGIN_BOTTOM_CM = 2.5
+MARGIN_LEFT_CM = 3.0
+MARGIN_RIGHT_CM = 2.0
+BINDING_GUTTER_CM = 0.5
+
+# Typography (UTC spec baseline)
+BODY_FONT = "Times New Roman"
+BODY_SIZE_PT = 13
+H1_SIZE_PT = 18
+H2_SIZE_PT = 16
+H3_SIZE_PT = 14
+LINE_SPACING = 1.5
+FIRST_LINE_INDENT_CM = 0.5
+
+# School info — UPDATE these
+SCHOOL_LOGO_PATH = "documents/<thesis-dir>/figures/school-logo.png"
+SCHOOL_NAME = "TRƯỜNG ĐẠI HỌC [SCHOOL NAME]"
+FACULTY_NAME = "KHOA [FACULTY NAME]"
+DEPARTMENT_NAME = "BỘ MÔN [DEPARTMENT NAME]"
+
+
+# =============================================================================
+# UTIL — section setup
+# =============================================================================
+
+def setup_page(doc):
+    """Apply A4 + margins + binding gutter per VN spec."""
+    section = doc.sections[0]
+    section.page_width = Cm(PAGE_WIDTH_CM)
+    section.page_height = Cm(PAGE_HEIGHT_CM)
+    section.top_margin = Cm(MARGIN_TOP_CM)
+    section.bottom_margin = Cm(MARGIN_BOTTOM_CM)
+    section.left_margin = Cm(MARGIN_LEFT_CM)
+    section.right_margin = Cm(MARGIN_RIGHT_CM)
+    section.gutter = Cm(BINDING_GUTTER_CM)
+    section.orientation = WD_ORIENT.PORTRAIT
+
+
+def setup_styles(doc):
+    """Apply TNR 13pt body + heading sizes per VN spec."""
+    styles = doc.styles
+
+    # Body / Normal
+    normal = styles["Normal"]
+    normal.font.name = BODY_FONT
+    normal.font.size = Pt(BODY_SIZE_PT)
+    normal.paragraph_format.line_spacing = LINE_SPACING
+    normal.paragraph_format.first_line_indent = Cm(FIRST_LINE_INDENT_CM)
+    normal.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+    # Heading 1 (Chương N) — 18pt all-caps bold
+    h1 = styles["Heading 1"]
+    h1.font.name = BODY_FONT
+    h1.font.size = Pt(H1_SIZE_PT)
+    h1.font.bold = True
+    h1.font.color.rgb = RGBColor(0, 0, 0)
+    h1.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Heading 2 (Section N.M) — 16pt bold
+    h2 = styles["Heading 2"]
+    h2.font.name = BODY_FONT
+    h2.font.size = Pt(H2_SIZE_PT)
+    h2.font.bold = True
+    h2.font.color.rgb = RGBColor(0, 0, 0)
+
+    # Heading 3 (Subsection N.M.P) — 14pt bold
+    h3 = styles["Heading 3"]
+    h3.font.name = BODY_FONT
+    h3.font.size = Pt(H3_SIZE_PT)
+    h3.font.bold = True
+    h3.font.color.rgb = RGBColor(0, 0, 0)
+
+
+# =============================================================================
+# PRE-PROCESSING — Mermaid → PNG via mermaid-cli
+# =============================================================================
+
+MERMAID_RE = re.compile(r"```mermaid\n(.*?)```", re.DOTALL)
+
+
+def render_mermaid_blocks(chapter_md_path: Path, figure_dir: Path) -> str:
+    """Replace ```mermaid blocks in chapter MD with ![Hình X.Y](figure-N.png) image refs.
+
+    Requires mermaid-cli installed: npm install -g @mermaid-js/mermaid-cli
+    """
+    figure_dir.mkdir(parents=True, exist_ok=True)
+    content = chapter_md_path.read_text(encoding="utf-8")
+
+    def replace_block(match, idx=[0]):
+        idx[0] += 1
+        figure_file = figure_dir / f"{chapter_md_path.stem}-figure-{idx[0]}.png"
+        mermaid_code = match.group(1).strip()
+
+        # Run mermaid-cli
+        proc = subprocess.run(
+            ["mmdc", "-i", "-", "-o", str(figure_file), "--scale", "2"],
+            input=mermaid_code, text=True, capture_output=True,
+        )
+        if proc.returncode != 0:
+            print(f"WARN: mermaid-cli failed for {chapter_md_path.name} block {idx[0]}: {proc.stderr}", file=sys.stderr)
+            return match.group(0)  # leave as-is on failure
+
+        return f"![Hình X.{idx[0]}]({figure_file})\n*Nguồn: tác giả tự xây dựng*"
+
+    return MERMAID_RE.sub(replace_block, content)
+
+
+# =============================================================================
+# COVER PAGE
+# =============================================================================
+
+def add_cover_page(doc, info: dict):
+    """Add bìa chính per VN convention.
+
+    info dict expected keys: student_name, mssv, class, year, advisor, reviewer,
+    thesis_level, title_vn, title_en (optional), submission_year
+    """
+    # School logo
+    logo_path = Path(SCHOOL_LOGO_PATH)
+    if logo_path.exists():
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        run = p.add_run()
+        run.add_picture(str(logo_path), width=Cm(4))
+    else:
+        print(f"WARN: school logo not found at {SCHOOL_LOGO_PATH} — using text placeholder", file=sys.stderr)
+        p = doc.add_paragraph(f"[LOGO {SCHOOL_NAME}]")
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # School / Faculty / Department
+    for line in [SCHOOL_NAME, FACULTY_NAME, DEPARTMENT_NAME]:
+        p = doc.add_paragraph(line)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in p.runs:
+            run.bold = True
+
+    # Spacer
+    doc.add_paragraph()
+    doc.add_paragraph()
+
+    # KHÓA LUẬN TỐT NGHIỆP
+    p = doc.add_paragraph(f"KHÓA LUẬN TỐT NGHIỆP\nĐẠI HỌC {info['thesis_level'].upper()}")
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in p.runs:
+        run.bold = True
+        run.font.size = Pt(16)
+
+    # Thesis title
+    doc.add_paragraph()
+    p = doc.add_paragraph(info["title_vn"])
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in p.runs:
+        run.bold = True
+        run.font.size = Pt(20)
+
+    if info.get("title_en"):
+        p = doc.add_paragraph(info["title_en"])
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in p.runs:
+            run.italic = True
+            run.font.size = Pt(14)
+
+    # Spacer
+    doc.add_paragraph()
+    doc.add_paragraph()
+
+    # Student + advisor info
+    for label, value in [
+        ("Sinh viên thực hiện", info["student_name"]),
+        ("MSSV", info["mssv"]),
+        ("Lớp", info["class"]),
+        ("Khóa", info["year"]),
+        ("Giảng viên hướng dẫn", info["advisor"]),
+    ]:
+        p = doc.add_paragraph(f"{label}: {value}")
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.first_line_indent = Cm(0)
+
+    if info.get("reviewer") and info["reviewer"] != "TBD":
+        p = doc.add_paragraph(f"Giảng viên phản biện: {info['reviewer']}")
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.first_line_indent = Cm(0)
+
+    # Footer year
+    doc.add_paragraph()
+    p = doc.add_paragraph(f"HÀ NỘI — {info['submission_year']}")
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in p.runs:
+        run.bold = True
+        run.font.size = Pt(14)
+
+    doc.add_page_break()
+
+
+# =============================================================================
+# CHAPTER PARSING — markdown → docx paragraphs
+# =============================================================================
+
+def parse_chapter_md(content: str, doc):
+    """Parse markdown content (with Mermaid pre-rendered to images) and append to doc.
+
+    Supports:
+    - Heading 1 (#) → Heading 1 style
+    - Heading 2 (##) → Heading 2 style
+    - Heading 3 (###) → Heading 3 style
+    - Paragraphs → Normal style
+    - Inline emphasis (*italic*, **bold**)
+    - Image refs ![caption](path) → inline_shape
+    - Lists (- bullet / 1. ordered)
+    - Tables (| col | col |) — simple support
+
+    Adapt this to your markdown variant. For richer parsing, consider using
+    markdown + python-docx markdown filter OR pandoc filter route.
+    """
+    lines = content.split("\n")
+    in_code_block = False
+    code_buffer = []
+
+    for line in lines:
+        # Skip frontmatter
+        if line.strip() == "---" and not in_code_block:
+            continue
+
+        # Code block tracking (skip code in docx body — academic style mandates UPPERCASE inline)
+        if line.startswith("```"):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            code_buffer.append(line)
+            continue
+
+        # Heading 1 → CHƯƠNG N
+        if line.startswith("# "):
+            doc.add_heading(line[2:].strip(), level=1)
+        elif line.startswith("## "):
+            doc.add_heading(line[3:].strip(), level=2)
+        elif line.startswith("### "):
+            doc.add_heading(line[4:].strip(), level=3)
+        # Image
+        elif match := re.match(r"!\[(.*?)\]\((.*?)\)", line.strip()):
+            caption, image_path = match.groups()
+            img_path = Path(image_path)
+            if img_path.exists():
+                doc.add_picture(str(img_path), width=Cm(15))
+                # Caption below
+                p = doc.add_paragraph(f"**{caption}**")
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            else:
+                doc.add_paragraph(f"[MISSING IMAGE: {image_path}]")
+        # List item
+        elif line.startswith("- ") or re.match(r"^\d+\. ", line):
+            doc.add_paragraph(line.lstrip("- ").lstrip("0123456789. "), style="List Bullet")
+        # Blank line
+        elif line.strip() == "":
+            continue
+        # Regular paragraph (with simple inline emphasis)
+        else:
+            p = doc.add_paragraph()
+            # Simple inline parsing — extend as needed
+            parts = re.split(r"(\*\*.*?\*\*|\*.*?\*|`.*?`)", line)
+            for part in parts:
+                if part.startswith("**") and part.endswith("**"):
+                    run = p.add_run(part[2:-2])
+                    run.bold = True
+                elif part.startswith("*") and part.endswith("*"):
+                    run = p.add_run(part[1:-1])
+                    run.italic = True
+                elif part.startswith("`") and part.endswith("`"):
+                    # Inline code: per rule §C4 no-font-swap, render as UPPERCASE TNR italic
+                    run = p.add_run(part[1:-1].upper())
+                    run.italic = True
+                else:
+                    p.add_run(part)
+
+
+# =============================================================================
+# MAIN ASSEMBLY
+# =============================================================================
+
+def parse_thesis_info(info_path: Path) -> dict:
+    """Parse thesis-info.md → dict of {student_name, mssv, ...}."""
+    content = info_path.read_text(encoding="utf-8")
+    info = {}
+    patterns = {
+        "student_name": r"\*\*Họ tên:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "mssv": r"\*\*MSSV:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "class": r"\*\*Lớp:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "year": r"\*\*Khóa:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "advisor": r"\*\*GVHD.*?:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "reviewer": r"\*\*GVPB.*?:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "thesis_level": r"\*\*Level:\*\*\s*\[?([^\]\n]+?)\]?$",
+        "title_vn": r"\*\*Title \(Vietnamese\):\*\*\s*\[?([^\]\n]+?)\]?$",
+        "title_en": r"\*\*Title \(English\).*?:\*\*\s*\[?([^\]\n]+?)\]?$",
+    }
+    for key, pattern in patterns.items():
+        match = re.search(pattern, content, re.MULTILINE)
+        info[key] = match.group(1).strip() if match else f"[{key.upper()} NOT SET]"
+
+    info["submission_year"] = info["year"].split("-")[-1] if "-" in info["year"] else info["year"]
+    return info
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Assemble thesis DOCX from chapter MDs")
+    parser.add_argument("--chapters", type=Path, required=True, help="Directory containing chapter-N.md files")
+    parser.add_argument("--bibliography", type=Path, required=True, help="Path to bibliography.md")
+    parser.add_argument("--info", type=Path, required=True, help="Path to thesis-info.md")
+    parser.add_argument("--output", type=Path, required=True, help="Output DOCX path")
+    parser.add_argument("--figure-dir", type=Path, default=None, help="Pre-rendered figure output dir (default: <chapters-parent>/figures/)")
+    args = parser.parse_args()
+
+    if not args.figure_dir:
+        args.figure_dir = args.chapters.parent / "figures"
+
+    print(f"[assemble-thesis] Parsing info: {args.info}", file=sys.stderr)
+    info = parse_thesis_info(args.info)
+    print(f"  Student: {info['student_name']}", file=sys.stderr)
+    print(f"  Title: {info['title_vn']}", file=sys.stderr)
+    print(f"  Level: {info['thesis_level']}", file=sys.stderr)
+
+    print(f"[assemble-thesis] Creating document...", file=sys.stderr)
+    doc = Document()
+    setup_page(doc)
+    setup_styles(doc)
+
+    print(f"[assemble-thesis] Adding cover page...", file=sys.stderr)
+    add_cover_page(doc, info)
+
+    # Find chapters
+    chapter_files = sorted(args.chapters.glob("chapter-*.md"))
+    if not chapter_files:
+        print(f"ERROR: no chapter-*.md files found in {args.chapters}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"[assemble-thesis] Processing {len(chapter_files)} chapters...", file=sys.stderr)
+    for chapter_path in chapter_files:
+        print(f"  {chapter_path.name}", file=sys.stderr)
+        # Pre-render Mermaid → PNG
+        content = render_mermaid_blocks(chapter_path, args.figure_dir)
+        # Parse + append to doc
+        parse_chapter_md(content, doc)
+        doc.add_page_break()
+
+    # Bibliography
+    print(f"[assemble-thesis] Appending bibliography...", file=sys.stderr)
+    if args.bibliography.exists():
+        content = args.bibliography.read_text(encoding="utf-8")
+        parse_chapter_md(content, doc)
+
+    # Save
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    doc.save(str(args.output))
+    print(f"[assemble-thesis] DOCX written: {args.output}", file=sys.stderr)
+
+    # Verify A4 page size
+    verify_doc = Document(str(args.output))
+    s = verify_doc.sections[0]
+    assert abs(s.page_width.cm - 21.0) < 0.01, f"Page width {s.page_width.cm} != 21.0 (A4)"
+    assert abs(s.page_height.cm - 29.7) < 0.01, f"Page height {s.page_height.cm} != 29.7 (A4)"
+    print(f"[assemble-thesis] Verified: A4 page size + VN margins", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

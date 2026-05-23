@@ -1,0 +1,138 @@
+---
+audience: dev
+---
+
+# Chapter Mapping — outline before drafting
+
+Copy this file to `documents/<thesis-dir>/chapter-mapping.md` and adapt to your scope.
+
+VN cử nhân CNTT typical structure (4-5 body chapters + KẾT LUẬN). Adapt page targets to your level.
+
+## Chương 1 — TỔNG QUAN VỀ ĐỀ TÀI
+
+**Target:** 12-15 trang (cử nhân)
+
+### 1.1 Bối cảnh + động lực
+- Xu hướng ngành (cite [N] reports)
+- Vấn đề thực tế (cite [N] surveys / market data)
+- Lý do chọn đề tài
+
+### 1.2 Mục tiêu + phạm vi
+- Mục tiêu tổng quát
+- Mục tiêu cụ thể (3-5 items)
+- Phạm vi (functional + technical)
+- Giới hạn
+
+### 1.3 Tổng quan nghiên cứu liên quan
+- Sản phẩm thương mại tương tự (3-5 examples với cite)
+- Công trình học thuật liên quan (3-5 papers với cite)
+- Phân tích gap + cơ hội (your unique angle)
+
+### 1.4 Phương pháp luận
+- Methodology framework (cite Beck TDD / Deming PDCA / IEEE 730)
+- Quy trình phát triển (Agile / Wave-based / etc.)
+- Tools + tech stack
+
+### 1.5 Cấu trúc khóa luận
+- Brief overview each chapter (3-5 sentences each)
+
+## Chương 2 — CƠ SỞ LÝ THUYẾT + PHÂN TÍCH YÊU CẦU
+
+**Target:** 15-20 trang
+
+### 2.1 Cơ sở lý thuyết
+#### 2.1.1 [Theory area 1 — e.g., Multi-tenant architecture]
+#### 2.1.2 [Theory area 2 — e.g., JWT authentication]
+#### 2.1.3 [Theory area 3 — e.g., Vietnamese data localization law]
+
+### 2.2 Khảo sát hiện trạng
+#### 2.2.1 Persona phân tích (5-10 personas)
+#### 2.2.2 Pain points
+#### 2.2.3 So sánh sản phẩm cạnh tranh (table format)
+
+### 2.3 Phân tích yêu cầu
+#### 2.3.1 Yêu cầu chức năng (functional requirements list)
+#### 2.3.2 Yêu cầu phi chức năng (NFR — performance, security, scalability)
+#### 2.3.3 Use case diagrams (Hình 2.X)
+#### 2.3.4 Data model (ERD — Hình 2.X)
+
+## Chương 3 — THIẾT KẾ HỆ THỐNG
+
+**Target:** 15-20 trang
+
+### 3.1 Kiến trúc tổng quan
+#### 3.1.1 Sơ đồ ngữ cảnh C4 Level 1 (Hình 3.X)
+#### 3.1.2 Sơ đồ container C4 Level 2 (Hình 3.X)
+#### 3.1.3 Sơ đồ component C4 Level 3 (Hình 3.X)
+
+### 3.2 Thiết kế dữ liệu
+#### 3.2.1 Schema design (ERD chi tiết — Hình 3.X)
+#### 3.2.2 Index strategy
+#### 3.2.3 Migration strategy
+
+### 3.3 Thiết kế API
+#### 3.3.1 REST API conventions
+#### 3.3.2 Endpoint sample (Bảng 3.X)
+#### 3.3.3 Authentication flow (Sequence — Hình 3.X)
+
+### 3.4 Thiết kế bảo mật
+#### 3.4.1 Threat model (STRIDE / OWASP Top 10)
+#### 3.4.2 Defense layers
+#### 3.4.3 Compliance (PDPL / Cybersecurity 2018)
+
+### 3.5 Thiết kế UI/UX
+#### 3.5.1 Information architecture
+#### 3.5.2 Design system
+#### 3.5.3 Key user flows (Hình 3.X)
+
+## Chương 4 — TRIỂN KHAI VÀ KẾT QUẢ
+
+**Target:** 15-20 trang
+
+### 4.1 Hạ tầng triển khai
+- Cloud provider choice + rationale
+- Network topology
+- Deployment pipeline (CI/CD diagram — Hình 4.X)
+
+### 4.2 Triển khai module trọng tâm (1-3 modules)
+#### 4.2.1 [Module 1 — code walkthrough + key decisions]
+#### 4.2.2 [Module 2]
+#### 4.2.3 [Module 3]
+
+### 4.3 Kiểm thử
+- Unit test coverage (%)
+- Integration test scope
+- End-to-end test scenarios
+- Security test (pen-test light)
+
+### 4.4 Kết quả thực nghiệm
+#### 4.4.1 KPI performance (Bảng 4.X — with methodology block per rule §S5)
+#### 4.4.2 Lighthouse / load test results
+#### 4.4.3 User feedback (if applicable)
+
+## KẾT LUẬN VÀ KIẾN NGHỊ
+
+**Target:** 3-5 trang
+
+### Tổng kết
+- What was achieved (mapping back to Ch.1 §1.2 objectives)
+
+### Hạn chế
+- Honest scope cuts + technical debts
+
+### Hướng phát triển
+- Concrete next steps + scope expansion
+
+### Đóng góp khoa học (mandatory per rule §C2)
+- Explicit 1-2 contributions methodological OR empirical novel
+- Example: "Quality-Driven Development approach kết hợp solo-dev workflow với outside-in audit (3-agent persona simulation) để eliminate inside-out blindspots — chứng minh hiệu quả trên 100+ wave shipping qua 4 tháng"
+
+## Bibliography target
+
+- ≥30 entries (cử nhân) / ≥50 (kỹ sư) / ≥80 (thạc sĩ)
+- Mix:
+  - ≥30% peer-reviewed papers
+  - Standards (ISO / IEEE / RFC) where applicable
+  - Vendor docs (acceptable but low weight)
+  - 1-2 department giáo trình
+  - VN laws if scope touches user data

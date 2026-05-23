@@ -1,0 +1,73 @@
+# TÀI LIỆU THAM KHẢO
+
+IEEE format. Cite in body với `[N]` ordinal by first appearance. Page-num cho direct quotes: `[15, tr.314]`.
+
+---
+
+## I. Sách + giáo trình (Textbooks)
+
+[1] [Department giáo trình author], *[Tiêu đề giáo trình]*, X ed. Hà Nội: [Publisher], YYYY, pp. NN-MM.
+
+[2] [Author], *[Book Title]*, X ed. City: Publisher, YYYY.
+
+## II. Bài báo khoa học (Peer-reviewed papers)
+
+[3] [Author], "[Article title]," *Journal Name*, vol. X, no. Y, pp. NN-MM, Month YYYY. [Online]. Available: https://doi.org/... [Accessed: DD-MMM-YYYY].
+
+[4] [Author], "[Conference paper title]," in *Proc. [Conference Name]*, City, YYYY, pp. NN-MM.
+
+## III. Tiêu chuẩn (Standards)
+
+[5] IEEE Standard for Software Quality Assurance Processes, IEEE Std 730-2014, 2014.
+
+[6] ISO/IEC 27001:2022, Information Security Management Systems, International Organization for Standardization, 2022.
+
+[7] RFC 7519, JSON Web Token (JWT), Internet Engineering Task Force, May 2015. [Online]. Available: https://datatracker.ietf.org/doc/html/rfc7519
+
+## IV. Văn bản pháp luật (Legal references — if scope touches)
+
+[8] Quốc hội Việt Nam, *Luật Bảo vệ Dữ liệu Cá nhân (PDPL)*, Luật số 91/2023/QH15, 2023.
+
+[9] Chính phủ Việt Nam, *Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân*, 2023.
+
+[10] Chính phủ Việt Nam, *Nghị định 53/2022/NĐ-CP quy định chi tiết một số điều của Luật An ninh mạng*, 2022.
+
+[11] Bộ Tài chính, *Thông tư 78/2021/TT-BTC hướng dẫn về hóa đơn điện tử*, 2021.
+
+## V. Tài liệu kỹ thuật chính thức (Official vendor docs)
+
+[12] [Vendor Name], "[Doc Title]," [Vendor]. Available: https://... (accessed DD-MMM-YYYY).
+
+## VI. Báo cáo ngành + grey literature
+
+[13] [Report author/org], *[Report title]*, [Org], YYYY. [Online]. Available: https://... (accessed DD-MMM-YYYY).
+
+---
+
+## Notes for thesis author
+
+**Required mix per `thesis-content-standard.md` §C3:**
+- Total ≥30 entries (cử nhân) / ≥50 (kỹ sư) / ≥80 (thạc sĩ)
+- ≥30% peer-reviewed papers
+- ≥1-2 your department's giáo trình
+- VN laws if scope touches user data / education / payment
+
+**Citation discipline:**
+- Body cite `[N]` ordinal by first appearance (NOT alphabetical)
+- Direct quotes: page-num mandatory `[15, tr.314]`
+- Web URLs: include access date `(accessed DD-MMM-YYYY)`
+
+**Anti-patterns (per rule §C5 Standalone-document principle):**
+- KHÔNG cite internal `documents/04-quality/audits/*.md` audit reports
+- KHÔNG cite internal chapter MD cross-refs as bibliography
+- KHÔNG cite internal `documents/03-planning/*.md` plans
+- Bibliography refs ONLY from public sources (papers / standards / official vendor docs / regulator gov.vn)
+
+**Validation script:**
+
+```bash
+# Verify 100% inline cite utilization (rule §C3)
+for n in $(grep -oP '^\[\d+\]' documents/<thesis-dir>/references/bibliography.md | tr -d '[]'); do
+  grep -q "\[$n[,\]]" documents/<thesis-dir>/chapters/*.md || echo "Orphan: [$n] in bibliography but never cited"
+done
+```

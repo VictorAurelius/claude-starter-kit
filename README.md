@@ -26,12 +26,12 @@ Most Claude Code starter content is either generic templates from official docs 
 
 | Layer | Count | What it gives you |
 |-------|------:|-------------------|
-| **Rules** | 26 | Governance for gap closure, audits, deploy, AWS access, retry budgets, rule changes — each grounded in real incidents |
-| **Skills** | 15 | Development methodology (TDD, brainstorming, debugging, code review, quality audit /100, UI review /128) with project-specific gotchas |
+| **Rules** | 39 | Governance for gap closure, audits, deploy, AWS access, retry budgets, rule changes, **thesis writing** — each grounded in real incidents |
+| **Skills** | 15+ | Development methodology (TDD, brainstorming, debugging, code review, quality audit /100, UI review /128, **thesis assembly**) with project-specific gotchas |
 | **Scripts** | 5 | `check-ci.sh`, `test-local.sh`, `pre-commit-check.sh`, `render-diagrams.sh`, `capture-screenshots.ts` |
 | **Bin tools** | 6 | `init-project.sh`, `upgrade-project.sh`, `install-remote.sh`, `contribute.sh`, `publish.sh`, `test-kit.sh` |
-| **Memory seeds** | 4 | Lessons learned (`feedback_*`) ready to auto-load |
-| **Templates** | 5+ | `CLAUDE.md`, `README.md`, skill folder scaffold, more |
+| **Memory seeds** | 5 | Lessons learned (`feedback_*`) ready to auto-load |
+| **Templates** | 9+ | `CLAUDE.md`, `README.md`, skill folder scaffold, thesis templates, more |
 
 ## Quick start
 
