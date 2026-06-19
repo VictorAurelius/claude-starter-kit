@@ -8,7 +8,8 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+# Repo root is the parent of bin/ — all integrity checks are root-relative.
+cd "$SCRIPT_DIR/.."
 
 PASS=0
 FAIL=0
@@ -34,9 +35,9 @@ echo "📋 Required files:"
 check "VERSION" "test -f VERSION"
 check "CHANGELOG.md" "test -f CHANGELOG.md"
 check "README.md" "test -f README.md"
-check "init-project.sh" "test -f init-project.sh && test -x init-project.sh"
-check "upgrade-project.sh" "test -f upgrade-project.sh && test -x upgrade-project.sh"
-check "contribute.sh" "test -f contribute.sh && test -x contribute.sh"
+check "init-project.sh" "test -f bin/init-project.sh && test -x bin/init-project.sh"
+check "upgrade-project.sh" "test -f bin/upgrade-project.sh && test -x bin/upgrade-project.sh"
+check "contribute.sh" "test -f bin/contribute.sh && test -x bin/contribute.sh"
 
 echo ""
 echo "📋 Skills (9 required):"
@@ -82,7 +83,7 @@ check "VERSION is semver" "grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' VERSION"
 echo ""
 echo "📋 Init script test:"
 TMPDIR=$(mktemp -d)
-check "init-project.sh runs" "bash init-project.sh $TMPDIR > /dev/null 2>&1"
+check "init-project.sh runs" "bash bin/init-project.sh $TMPDIR > /dev/null 2>&1"
 check "Creates .claude/skills/" "test -d $TMPDIR/.claude/skills/core"
 check "Creates scripts/" "test -d $TMPDIR/scripts"
 check "Creates CLAUDE.md" "test -f $TMPDIR/CLAUDE.md"

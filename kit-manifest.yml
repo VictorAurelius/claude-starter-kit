@@ -22,6 +22,21 @@ new-only:
   - skills/document-generation/thesis/SKILL.md
   - skills/document-generation/thesis/templates/*.template
   - rules/thesis-content-standard.md
+  # v2.8.0 — audit suite + workflow suite (new-only: projects customize skills)
+  - skills/quality-audit/**
+  - skills/quality/api-contract-audit/**
+  - skills/quality/business-logic-audit/**
+  - skills/quality/design-pattern-audit/**
+  - skills/quality/ops-readiness-audit/**
+  - skills/quality/performance-audit/**
+  - skills/quality/security-audit/**
+  - skills/quality/wave-pack-planner/**
+  - skills/workflow/start-session/**
+  - skills/workflow/end-session/**
+  - skills/workflow/repo-status/**
+  - skills/workflow/check-pr/**
+  - skills/workflow/fix-pr/**
+  - skills/workflow/start-pr/**
 
 merge-required:
   - skills/core/brainstorming-methodology.md

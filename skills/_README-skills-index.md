@@ -26,11 +26,18 @@
 | File | Dùng khi |
 |------|----------|
 | `workflow/development-workflow.md` | Git, PR, commit, self-test, CI monitoring |
+| `workflow/start-session/SKILL.md` | Bắt đầu session — load context + current state (graceful degradation) |
+| `workflow/end-session/SKILL.md` | Kết thúc session — sync docs + handoff note |
+| `workflow/repo-status/SKILL.md` | Health check repo (CI, branches, PRs) — 5 mức GREEN→BLACK |
+| `workflow/start-pr/SKILL.md` · `check-pr/` · `fix-pr/` | Vòng đời PR: tạo / kiểm compliance / sửa |
 
 ### Quality
 | File | Dùng khi |
 |------|----------|
-| `quality/quality-audit.md` | Đánh giá chất lượng /100 điểm |
+| `quality/quality-audit.md` | Đánh giá chất lượng /100 điểm (bản flat ngắn) |
+| `quality-audit/SKILL.md` | Audit chất lượng tổng /100 — bản skill đầy đủ |
+| `quality/{api-contract,business-logic,design-pattern,ops-readiness,performance,security}-audit/` | Audit chuyên biệt /100 mỗi mảng |
+| `quality/wave-pack-planner/SKILL.md` | Cluster gaps disjoint → wave-pack + spawn parallel agents |
 
 ### Reference
 | File | Dùng khi |

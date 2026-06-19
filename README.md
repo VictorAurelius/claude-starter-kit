@@ -26,8 +26,8 @@ Most Claude Code starter content is either generic templates from official docs 
 
 | Layer | Count | What it gives you |
 |-------|------:|-------------------|
-| **Rules** | 39 | Governance for gap closure, audits, deploy, AWS access, retry budgets, rule changes, **thesis writing** — each grounded in real incidents |
-| **Skills** | 15+ | Development methodology (TDD, brainstorming, debugging, code review, quality audit /100, UI review /128, **thesis assembly**) with project-specific gotchas |
+| **Rules** | 61 | Governance for context budgeting, gap pipeline, audits, agent orchestration, worktree/multi-session safety, runtime-walk-before-DONE, deploy, retry budgets, rule changes, **thesis writing** — each grounded in real incidents |
+| **Skills** | 29+ | Development methodology + **audit suite** (api-contract, business-logic, design-pattern, ops, performance, security /100) + **workflow suite** (start/end-session, repo-status, PR lifecycle, wave-pack parallel planning) + thesis assembly — each with gotchas |
 | **Scripts** | 5 | `check-ci.sh`, `test-local.sh`, `pre-commit-check.sh`, `render-diagrams.sh`, `capture-screenshots.ts` |
 | **Bin tools** | 6 | `init-project.sh`, `upgrade-project.sh`, `install-remote.sh`, `contribute.sh`, `publish.sh`, `test-kit.sh` |
 | **Memory seeds** | 5 | Lessons learned (`feedback_*`) ready to auto-load |
