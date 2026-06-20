@@ -16,7 +16,9 @@
 set -uo pipefail
 
 TARGET="${1:-.}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Kit content lives at the repo root (parent of bin/) — resolve there.
+KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$KIT_ROOT"
 
 MODE="plan"  # default
 ONLY_SCRIPTS=false

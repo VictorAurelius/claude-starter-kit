@@ -14,7 +14,8 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+# Operate from the repo root (parent of bin/).
+cd "$SCRIPT_DIR/.."
 
 DRY_RUN=false
 

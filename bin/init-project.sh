@@ -15,7 +15,10 @@
 set -euo pipefail
 
 TARGET="${1:-.}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Kit content (skills/scripts/templates/memory/VERSION) lives at the repo root,
+# the parent of bin/ — resolve there so copies find the real source.
+KIT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$KIT_ROOT"
 
 echo "═══════════════════════════════════════════════"
 echo "  Claude Code Starter Kit — Project Init"

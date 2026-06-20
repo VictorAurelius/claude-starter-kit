@@ -18,7 +18,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-KIT_DIR="$SCRIPT_DIR"
+# Kit content lives at the repo root (parent of bin/).
+KIT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 PROPOSAL_DIR="$KIT_DIR/.proposals"
 mkdir -p "$PROPOSAL_DIR"
 

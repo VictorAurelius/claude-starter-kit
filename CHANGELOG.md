@@ -7,6 +7,44 @@ Quản lý theo Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ---
 
+## [2.8.0] — 2026-06-19 — Governance core + audit suite + workflow suite
+
+Extracted + de-project-ified from a real 200+ PR project. Biggest content addition since 2.0.0.
+
+### Added — 22 rules
+
+**Meta-governance core (13):**
+- `rules/context-budget-mandate.md` — base auto-load budget; rules ≥1k tokens need `paths:` frontmatter or a justification section.
+- `rules/claude-md-content-discipline.md` — CLAUDE.md stays ≤250 lines; detail moves to path-scoped rules with 1-line pointers.
+- `rules/worktree-only-branch-work.md` — work any non-current branch via `git worktree add`, never `checkout`-swap the main tree.
+- `rules/multi-session-concurrency-coordination.md` — reserve ID/version blocks in a lock file before allocating when ≥2 sessions run.
+- `rules/session-end-context-check.md` — check actual context % before proposing end-session / `/clear` (needs a compatible `.claude/statusline.sh`; degrades to a manual prompt otherwise).
+- `rules/agent-model-opus-default.md` — spawn the most capable model for non-trivial agents to avoid thrash.
+- `rules/agent-concurrency-budget-inline-hybrid.md` — when throttling agent count for rate limits, fill idle by doing disjoint work inline.
+- `rules/feature-ship-runtime-walk-mandate.md` — manual runtime walk before marking a user-facing feature DONE; catalog-then-batch fixes.
+- `rules/cross-flow-bug-class-sweep.md` — after fixing a bug, grep all sister sites for the same class.
+- `rules/discovery-to-gap-inline-filing.md` — file gap-worthy findings inline same session, don't stash in narrative.
+- `rules/gap-folder-organization.md` — gap file location mirrors its phase; DONE → `closed/` archive.
+- `rules/design-first-investigation-order.md` — investigate design → gaps → docs → code (code last).
+- `rules/diagram-format-selection.md` — Mermaid / PlantUML / ASCII selection matrix for markdown diagrams.
+
+**Docs-scaling quartet (4):** `docs-filename-prefix-convention`, `docs-folder-volume-budget`, `docs-subfolder-maturity`, `docs-archival-cadence`.
+
+**Audit-skill rubric rules (5):** `audit-skill-rubric-{quality-audit,api-contract-audit,business-logic-audit,ops-readiness-audit,performance-audit}.md` — per-check pass/fail + P0/P1/P2 severity caps; pair with the audit skills below.
+
+### Added — 14 skills
+
+**Audit suite (7):** `skills/quality-audit/` + `skills/quality/{api-contract,business-logic,design-pattern,ops-readiness,performance,security}-audit/` — /100 specialist audits with scoring guides + eval fixtures.
+
+**Workflow suite (7):** `skills/workflow/{start-session,end-session,repo-status,check-pr,fix-pr,start-pr}/` + `skills/quality/wave-pack-planner/` — session lifecycle, PR workflow, parallel-agent wave planning. `start-session/collect-state.sh` + `repo-status` scripts degrade gracefully (gap/wave/cloud sections only render when those artifacts exist; cloud probe opt-in via `--cloud`).
+
+### Notes
+
+- All content de-project-ified — no domain / cloud-provider / language-stack specifics. Bilingual VN/EN narrative preserved.
+- **Deferred to a follow-up batch:** version-bump of ~12 already-present rules to their newer source-project versions; `output-review-mandate.md` §3 matrix rows for the new rules; de-Kite of the 21 borderline rules.
+
+---
+
 ## [2.7.0] — 2026-06-04 — Thesis tooling skills + rule v2.0.0 sync
 
 ### Added (2 new skills)
